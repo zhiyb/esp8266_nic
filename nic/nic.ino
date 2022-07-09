@@ -46,7 +46,7 @@ void setup()
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   SPI.begin();
-  SPI.beginTransaction(SPISettings(8 * 1000 * 1000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(10 * 1000 * 1000, MSBFIRST, SPI_MODE0));
   digitalWrite(pin_spi_cs, HIGH);
   pinMode(pin_spi_cs, OUTPUT);
 
