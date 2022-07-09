@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <SPI.h>
+#include "wifi_network.h"
 
 static const unsigned int max_urllen  = 128;
 static const unsigned int max_datalen = 8192;
@@ -85,9 +86,10 @@ void loop()
     type = ReqUnknown;
   }
 
-  // Receive header: urllen, datalen
+  // Receive header: urllen, datalen, resplen
   uint16_t urllen = 0;
   uint16_t datalen = 0;
+  uint16_t resplen = 0;
   if (type != ReqUnknown) {
     urllen = spi_transfer('S');
     urllen |= spi_transfer('P') << 8;
@@ -95,6 +97,8 @@ void loop()
       datalen = spi_transfer(0xff);
       datalen |= spi_transfer(0xff) << 8;
     }
+    resplen = spi_transfer(0xff);
+    resplen |= spi_transfer(0xff) << 8;
     if (urllen >= max_urllen || datalen >= max_datalen) {
       Serial.print("Invalid length: ");
       Serial.print(urllen);
@@ -136,10 +140,22 @@ void loop()
     spi_transfer(code >> 8);
 
     Serial.print("HTTP ");
-    Serial.println(code);
+    Serial.print(code);
     if (code == HTTP_CODE_OK) {
       String resp = http.getString();
-      Serial.println(resp);
+      Serial.print(" LEN ");
+      Serial.print(resp.length());
+      if (resp.length() < resplen)
+        resplen = resp.length();
+      spi_transfer(resplen >> 0);
+      spi_transfer(resplen >> 8);
+
+      const char *pstr = resp.c_str();
+      for (unsigned int i = 0; i < resplen; i++)
+        spi_transfer(pstr[i]);
+      //Serial.println(resp);
+    } else {
+      Serial.println();
     }
   }
 
