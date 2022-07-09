@@ -154,9 +154,8 @@ void loop()
       for (unsigned int i = 0; i < resplen; i++)
         spi_transfer(pstr[i]);
       //Serial.println(resp);
-    } else {
-      Serial.println();
     }
+    Serial.println();
   }
 
   led(0);
