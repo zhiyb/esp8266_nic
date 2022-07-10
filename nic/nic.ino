@@ -36,7 +36,7 @@ static inline uint8_t spi_transfer(uint8_t v)
 
 void setup()
 {
-  pinMode(pin_req, INPUT_PULLUP);
+  pinMode(pin_req, INPUT);
   pinMode(pin_ack, OUTPUT);
   digitalWrite(pin_ack, HIGH);
 
@@ -70,7 +70,7 @@ void setup()
 void loop()
 {
   // Wait for data request
-  if (digitalRead(pin_req) == HIGH)
+  if (digitalRead(pin_req) == LOW)
     return;
 
   // Receive header: type
@@ -162,6 +162,6 @@ void loop()
 
   // Data request complete, wait for data request deassert
   digitalWrite(pin_ack, LOW);
-  while (digitalRead(pin_req) == LOW);
+  while (digitalRead(pin_req) == HIGH);
   digitalWrite(pin_ack, HIGH);
 }
